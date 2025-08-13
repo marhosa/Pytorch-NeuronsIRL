@@ -102,8 +102,7 @@ for epoch in range(epochCount):
         loss = lossFunction(yPrediction, y) #compare and calc loss
         loss.backward() #backpropagation
         optimizer.step() #update weights
-
-        if i % 500 == 0: # made it every 500 to not crash the cli
+        if i % 1000 == 0:
             print(f'Sample {i}, Loss: {loss.item():.3f}')
 print(f'\n\n\n')
 
