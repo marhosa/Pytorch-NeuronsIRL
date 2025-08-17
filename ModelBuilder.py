@@ -1,3 +1,9 @@
+"""
+marhosa
+This builds the Model 
+data is from the MNIST Number Data Set csv file
+"""
+print(f'\nRunning ModelBuilder') 
 import os
 import pandas as pd 
 import torch
@@ -5,6 +11,8 @@ import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
+
+
 
 
 #use cpu if gpu not available
@@ -130,4 +138,4 @@ print(f'[Test Report] \nAccuracy: {acc:.04f}% \nCorrect: {correctPredictionCount
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
 torch.save(model.state_dict(), "numberModel.pth")
 print(f'\n\nModel Saved to {currentDirectory}')
-
+# marhosa
