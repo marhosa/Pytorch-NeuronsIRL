@@ -60,79 +60,66 @@ train_dataset = TensorDataset(features_train, labels_train)
 test_dataset = TensorDataset(features_test, labels_test)
 
 #data loaders
-train_loader = DataLoader(train_dataset, batch_size = 32, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle = False)
+train_loader = DataLoader(train_dataset, batch_size = 128, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=128, shuffle = False)
 
 
 #### model itself
 class MyModelProMax(nn.Module):
     def __init__(self, input_size, hidden1_size, hidden2_size, output_size):
         super().__init__()
-        #this part is just linear algebra 
-        # they represent weight matrix and biases for each layer
         self.fc1 = nn.Linear(input_size, hidden1_size)
         self.fc2 = nn.Linear(hidden1_size, hidden2_size)
         self.fc3 = nn.Linear(hidden2_size, output_size)
     
     def forward(self, x):
-        #just linear transformations
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x) #output
         return x
     
-input_size = features_train.shape[1]  # number of features, 784 for MNIST flattened images
+input_size = features_train.shape[1]
 hidden1_size = 128
 hidden2_size = 64
-output_size = 10  # number of classes
+output_size = 10
 
-model = MyModelProMax(input_size, hidden1_size, hidden2_size, output_size).to(device) #the model
-
-    
+model = MyModelProMax(input_size, hidden1_size, hidden2_size, output_size).to(device)
 
 #### loss function and optimizer
-#used CrossEntropyLoss for classification
 lossFunction = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr= 0.001)
 
-
 #### training the model
-epochCount = 10
+epochCount = 250
 for epoch in range(epochCount):
     print(f'\n\nEpoch: {epoch + 1} out of {epochCount}')
 
-    for i in range(train_size):
-        x = features_train[i].unsqueeze(0).to(device)
-        y = labels_train[i].unsqueeze(0).to(device)
-
-        optimizer.zero_grad() # clear prev gradients
-        yPrediction = model(x)
-        loss = lossFunction(yPrediction, y) #compare and calc loss
-        loss.backward() #backpropagation
-        optimizer.step() #update weights
-        if i % 1000 == 0:
-            print(f'Sample {i}, Loss: {loss.item():.3f}')
+    for batch_idx, (x_batch, y_batch) in enumerate(train_loader): 
+        x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+        optimizer.zero_grad()
+        y_pred = model(x_batch) 
+        loss = lossFunction(y_pred, y_batch) 
+        loss.backward()
+        optimizer.step()
+        if batch_idx % 50 == 0: 
+            print(f'Batch {batch_idx}, Loss: {loss.item():.3f}') 
 print(f'\n\n\n')
 
-
 #### Test the model 
-model.eval() #set model to evaluation mode
+model.eval()
 correctPredictionCount = 0
+total = 0 
 
 with torch.no_grad():
-    for i in range(test_size):
-        x = features_test[i].unsqueeze(0).to(device)
-        y = labels_test[i].to(device)
-        pred = model(x) #prediction
-        predictedLabel = torch.argmax(pred, dim = 1).item()
+    for x_batch, y_batch in test_loader: 
+        x_batch, y_batch = x_batch.to(device), y_batch.to(device) 
+        pred = model(x_batch)
+        predictedLabels = torch.argmax(pred, dim=1) 
+        correctPredictionCount += (predictedLabels == y_batch).sum().item() 
+        total += y_batch.size(0) 
 
-        if y.item() == predictedLabel:
-            correctPredictionCount += 1
-
-acc = (correctPredictionCount / test_size )*100
-print(f'[Test Report] \nAccuracy: {acc:.04f}% \nCorrect: {correctPredictionCount} \nTotal:  {test_size}')
-
-
+acc = (correctPredictionCount / total )*100 
+print(f'[Test Report] \nAccuracy: {acc:.04f}% \nCorrect: {correctPredictionCount} \nTotal:  {total}')
 
 #### save the model 
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
