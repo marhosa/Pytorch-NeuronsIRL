@@ -12,7 +12,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
 
-
+batchSize = 64
+epochCount = 30
 
 
 #use cpu if gpu not available
@@ -60,8 +61,8 @@ train_dataset = TensorDataset(features_train, labels_train)
 test_dataset = TensorDataset(features_test, labels_test)
 
 #data loaders
-train_loader = DataLoader(train_dataset, batch_size = 128, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=128, shuffle = False)
+train_loader = DataLoader(train_dataset, batch_size = batchSize, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size= batchSize, shuffle = False)
 
 
 #### model itself
@@ -90,7 +91,6 @@ lossFunction = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr= 0.001)
 
 #### training the model
-epochCount = 250
 for epoch in range(epochCount):
     print(f'\n\nEpoch: {epoch + 1} out of {epochCount}')
 

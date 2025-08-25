@@ -10,6 +10,7 @@ import torch.nn.functional as F
 import json
 
 
+
 #### define the same model
 class MyModelProMax(nn.Module):
     def __init__(self, input_size, hidden1_size, hidden2_size, output_size):
@@ -42,6 +43,9 @@ model = MyModelProMax(input_size, hidden1_size, hidden2_size, output_size)
 #### Load the already trained model
 model.load_state_dict(torch.load("numberModel.pth"))
 model.eval() #set to evaluation mode
+
+
+
 
 
 #### Extract the weights and biases of each layer 
