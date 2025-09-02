@@ -12,8 +12,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
 
-batchSize = 64
-epochCount = 30
+batchSize = 256
+epochCount = 3
 
 
 #use cpu if gpu not available
